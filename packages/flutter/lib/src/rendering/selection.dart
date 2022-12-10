@@ -409,6 +409,7 @@ class GranularlyExtendSelectionEvent extends SelectionEvent {
     required this.forward,
     required this.isEnd,
     required this.granularity,
+    required this.collapseSelection,
   }) : super._(SelectionEventType.granularlyExtendSelection);
 
   /// Whether to extend the selection forward.
@@ -419,6 +420,9 @@ class GranularlyExtendSelectionEvent extends SelectionEvent {
 
   /// The granularity for which the selection extend.
   final TextGranularity granularity;
+
+  /// Collapse selection.
+  final bool collapseSelection;
 }
 
 /// The direction to extend a selection.
@@ -487,6 +491,7 @@ class DirectionallyExtendSelectionEvent extends SelectionEvent {
     required this.dx,
     required this.isEnd,
     required this.direction,
+    required this.collapseSelection,
   }) : super._(SelectionEventType.directionallyExtendSelection);
 
   /// The horizontal offset the selection should move to.
@@ -503,17 +508,22 @@ class DirectionallyExtendSelectionEvent extends SelectionEvent {
   ///  * [SelectionExtendDirection], which explains how to handle each enum.
   final SelectionExtendDirection direction;
 
+  /// Collapse selection.
+  final bool collapseSelection;
+
   /// Makes a copy of this object with its property replaced with the new
   /// values.
   DirectionallyExtendSelectionEvent copyWith({
     double? dx,
     bool? isEnd,
     SelectionExtendDirection? direction,
+    bool? collapseSelection,
   }) {
     return DirectionallyExtendSelectionEvent(
       dx: dx ?? this.dx,
       isEnd: isEnd ?? this.isEnd,
       direction: direction ?? this.direction,
+      collapseSelection: collapseSelection ?? this.collapseSelection,
     );
   }
 }

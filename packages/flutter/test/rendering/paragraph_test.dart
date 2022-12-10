@@ -917,6 +917,7 @@ void main() {
           forward: true,
           isEnd: true,
           granularity: TextGranularity.character,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -929,6 +930,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.character,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -964,6 +966,7 @@ void main() {
           forward: true,
           isEnd: true,
           granularity: TextGranularity.word,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -976,6 +979,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.word,
+          collapseSelection: false,
         ),
       );
       expect(paragraph.selections.length, 0); // how []are you
@@ -986,6 +990,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.word,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1021,6 +1026,7 @@ void main() {
           forward: true,
           isEnd: true,
           granularity: TextGranularity.line,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1033,6 +1039,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.line,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1070,6 +1077,7 @@ void main() {
           forward: true,
           isEnd: true,
           granularity: TextGranularity.document,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1085,6 +1093,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.document,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1119,6 +1128,7 @@ void main() {
           forward: true,
           isEnd: true,
           granularity: TextGranularity.word,
+          collapseSelection: false,
         ),
       );
       TextSelection selection = paragraph.selections[0];
@@ -1140,6 +1150,7 @@ void main() {
           forward: false,
           isEnd: true,
           granularity: TextGranularity.word,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1186,6 +1197,7 @@ void main() {
           isEnd: true,
           dx: baseline,
           direction: SelectionExtendDirection.nextLine,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1201,6 +1213,7 @@ void main() {
           isEnd: true,
           dx: baseline,
           direction: SelectionExtendDirection.previousLine,
+          collapseSelection: false,
         ),
       );
       selection = paragraph.selections[0];
@@ -1241,6 +1254,7 @@ void main() {
           isEnd: true,
           dx: baseline,
           direction: SelectionExtendDirection.forward,
+          collapseSelection: false,
         ),
       );
       TextSelection selection = paragraph.selections[0];
@@ -1260,6 +1274,7 @@ void main() {
         DirectionallyExtendSelectionEvent(
           isEnd: true,
           dx: baseline,
+          collapseSelection: false,
           direction: SelectionExtendDirection.backward,
         ),
       );
