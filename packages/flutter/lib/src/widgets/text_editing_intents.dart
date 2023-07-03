@@ -395,3 +395,9 @@ class TransposeCharactersIntent extends Intent {
   /// Creates a [TransposeCharactersIntent].
   const TransposeCharactersIntent();
 }
+
+/// An [Intent] to show selection context menu.
+class ShowSelectionMenuIntent extends Intent {
+  /// Creates an instance of [ShowSelectionMenuIntent].
+  const ShowSelectionMenuIntent();
+}

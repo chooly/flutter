@@ -301,6 +301,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     ExtendSelectionToLineBreakIntent: _makeOverridable(_GranularlyExtendCaretSelectionAction<ExtendSelectionToLineBreakIntent>(this, granularity: TextGranularity.line)),
     ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_DirectionallyExtendCaretSelectionAction<ExtendSelectionVerticallyToAdjacentLineIntent>(this)),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(_GranularlyExtendCaretSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(this, granularity: TextGranularity.document)),
+    ShowSelectionMenuIntent: _makeOverridable(_ShowSelectionMenuAction(this)),
   };
 
   final Map<Type, GestureRecognizerFactory> _gestureRecognizers = <Type, GestureRecognizerFactory>{};
@@ -1345,6 +1346,18 @@ class _DirectionallyExtendCaretSelectionAction<T extends DirectionalCaretMovemen
       return;
     }
     state._directionallyExtendSelection(intent.forward);
+  }
+}
+
+class _ShowSelectionMenuAction extends _NonOverrideAction<ShowSelectionMenuIntent> {
+  _ShowSelectionMenuAction(this.state);
+
+  final SelectableRegionState state;
+
+  @override
+  void invokeAction(ShowSelectionMenuIntent intent, [BuildContext? context]) {
+    state._showToolbar();
+    state._showHandles();
   }
 }
 
