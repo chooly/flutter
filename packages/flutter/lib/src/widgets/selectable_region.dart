@@ -291,6 +291,7 @@ class SelectableRegion extends StatefulWidget {
 class SelectableRegionState extends State<SelectableRegion> with TextSelectionDelegate implements SelectionRegistrar {
   late final Map<Type, Action<Intent>> _actions = <Type, Action<Intent>>{
     SelectAllTextIntent: _makeOverridable(_SelectAllAction(this)),
+    ClearSelectionIntent: _makeOverridable(_ClearSelectionAction(this)),
     CopySelectionTextIntent: _makeOverridable(_CopySelectionAction(this)),
     ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(_GranularlyExtendSelectionAction<ExtendSelectionToNextWordBoundaryOrCaretLocationIntent>(this, granularity: TextGranularity.word)),
     ExpandSelectionToDocumentBoundaryIntent: _makeOverridable(_GranularlyExtendSelectionAction<ExpandSelectionToDocumentBoundaryIntent>(this, granularity: TextGranularity.document)),
@@ -1279,6 +1280,17 @@ class _SelectAllAction extends _NonOverrideAction<SelectAllTextIntent> {
   @override
   void invokeAction(SelectAllTextIntent intent, [BuildContext? context]) {
     state.selectAll(SelectionChangedCause.keyboard);
+  }
+}
+
+class _ClearSelectionAction extends _NonOverrideAction<ClearSelectionIntent> {
+  _ClearSelectionAction(this.state);
+
+  final SelectableRegionState state;
+
+  @override
+  void invokeAction(ClearSelectionIntent intent, [BuildContext? context]) {
+    state._clearSelection();
   }
 }
 

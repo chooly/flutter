@@ -293,6 +293,17 @@ class SelectAllTextIntent extends Intent {
   final SelectionChangedCause cause;
 }
 
+/// An [Intent] to clear all selection.
+class ClearSelectionIntent extends Intent {
+  /// Creates an instance of [ClearSelectionIntent].
+  const ClearSelectionIntent(this.cause);
+
+  /// {@template flutter.widgets.TextEditingIntents.cause}
+  /// The [SelectionChangedCause] that triggered the intent.
+  /// {@endtemplate}
+  final SelectionChangedCause cause;
+}
+
 /// An [Intent] that represents a user interaction that attempts to copy or cut
 /// the current selection in the field.
 class CopySelectionTextIntent extends Intent {
