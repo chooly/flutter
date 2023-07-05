@@ -846,6 +846,7 @@ class _SelectionKeepAliveState extends State<_SelectionKeepAlive> with Automatic
     }
     return SelectionRegistrarScope(
       registrar: this,
+      enclose: false,
       child: widget.child,
     );
   }
