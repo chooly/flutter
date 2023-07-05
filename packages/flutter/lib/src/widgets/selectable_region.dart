@@ -209,6 +209,7 @@ class SelectableRegion extends StatefulWidget {
     required this.child,
     this.magnifierConfiguration = TextMagnifierConfiguration.disabled,
     this.onSelectionChanged,
+    this.showMenuWhenDrag = false,
   });
 
   /// {@macro flutter.widgets.magnifier.TextMagnifierConfiguration.intro}
@@ -240,6 +241,9 @@ class SelectableRegion extends StatefulWidget {
 
   /// Called when the selected content changes.
   final ValueChanged<SelectedContent?>? onSelectionChanged;
+
+  /// Weather to show selection menu when drag to select.
+  final bool showMenuWhenDrag;
 
   /// Returns the [ContextMenuButtonItem]s representing the buttons in this
   /// platform's default selection menu.
@@ -467,6 +471,10 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
 
   void _handleMouseDragEnd(DragEndDetails details) {
     _finalizeSelection();
+    if (widget.showMenuWhenDrag) {
+      _showToolbar();
+      _showHandles();
+    }
     _updateSelectedContentIfNeeded();
   }
 

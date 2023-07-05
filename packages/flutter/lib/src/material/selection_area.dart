@@ -45,6 +45,7 @@ class SelectionArea extends StatefulWidget {
     this.contextMenuBuilder = _defaultContextMenuBuilder,
     this.magnifierConfiguration,
     this.onSelectionChanged,
+    this.showMenuWhenDrag = false,
     required this.child,
   });
 
@@ -86,6 +87,9 @@ class SelectionArea extends StatefulWidget {
 
   /// Called when the selected content changes.
   final ValueChanged<SelectedContent?>? onSelectionChanged;
+
+  /// Weather to show selection menu when drag to select.
+  final bool showMenuWhenDrag;
 
   /// The child widget this selection area applies to.
   ///
@@ -141,6 +145,7 @@ class _SelectionAreaState extends State<SelectionArea> {
       contextMenuBuilder: widget.contextMenuBuilder,
       magnifierConfiguration: widget.magnifierConfiguration ?? TextMagnifier.adaptiveMagnifierConfiguration,
       onSelectionChanged: widget.onSelectionChanged,
+      showMenuWhenDrag: widget.showMenuWhenDrag,
       child: widget.child,
     );
   }
