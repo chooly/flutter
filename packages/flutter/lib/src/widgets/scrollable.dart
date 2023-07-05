@@ -1329,6 +1329,18 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
       dispatchSelectionEventToChild(selectables[currentSelectionEndIndex], const SelectAllSelectionEvent());
       return SelectionResult.end;
     }
+    if (result == SelectionResult.next || result == SelectionResult.previous) {
+      // The last child says it should move to next, or the first child says it should move to
+      // previous. Clear selection so selection moves out of this scrollable.
+      _selectableStartEdgeUpdateRecords.clear();
+      _selectableEndEdgeUpdateRecords.clear();
+      _currentDragStartRelatedToOrigin = null;
+      _currentDragEndRelatedToOrigin = null;
+      _selectionStartsInScrollable = false;
+      currentSelectionEndIndex = -1;
+      currentSelectionStartIndex = -1;
+      return result;
+    }
     // The selection geometry may not have the accurate offset for the edges
     // that are outside of the viewport whose transform may not be valid. Only
     // the edge this event is updating is sure to be accurate.
@@ -1336,9 +1348,7 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
       forceUpdateStart: !event.isEnd,
       forceUpdateEnd: event.isEnd,
     );
-    if (_selectionStartsInScrollable) {
-      _jumpToEdge(event.isEnd);
-    }
+    _jumpToEdge(event.isEnd);
     return result;
   }
 

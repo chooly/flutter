@@ -342,7 +342,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     _gestureRecognizers[TapGestureRecognizer] = GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
           () => TapGestureRecognizer(debugOwner: this),
           (TapGestureRecognizer instance) {
-        instance.onTap = _clearSelection;
+        instance.onTapDown = _handleSingleTapDown;
         instance.onSecondaryTapDown = _handleRightClickDown;
       },
     );
@@ -448,6 +448,11 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
           ..onLongPressEnd = _handleTouchLongPressEnd;
       },
     );
+  }
+
+  void _handleSingleTapDown(TapDownDetails details) {
+    _selectStartTo(offset: details.globalPosition);
+    _selectEndTo(offset: details.globalPosition);
   }
 
   void _startNewMouseSelectionGesture(DragDownDetails details) {
@@ -995,16 +1000,14 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     return _adjustingSelectionEnd = forward != isReversed;
   }
 
-  void _granularlyExtendSelection(TextGranularity granularity, bool forward) {
+  void _granularlyExtendSelection(TextGranularity granularity, bool forward, bool collapseSelection) {
     _directionalHorizontalBaseline = null;
-    if (!_selectionDelegate.value.hasSelection) {
-      return;
-    }
     _selectable?.dispatchSelectionEvent(
       GranularlyExtendSelectionEvent(
         forward: forward,
         isEnd: _determineIsAdjustingSelectionEnd(forward),
         granularity: granularity,
+        collapseSelection: collapseSelection,
       ),
     );
     _updateSelectedContentIfNeeded();
@@ -1012,8 +1015,17 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
 
   double? _directionalHorizontalBaseline;
 
-  void _directionallyExtendSelection(bool forward) {
+  void _directionallyExtendSelection(bool forward, bool collapseSelection) {
     if (!_selectionDelegate.value.hasSelection) {
+      _selectable?.dispatchSelectionEvent(
+        DirectionallyExtendSelectionEvent(
+          isEnd: true,
+          direction: forward ? SelectionExtendDirection.nextLine : SelectionExtendDirection.previousLine,
+          dx: 0,
+          collapseSelection: collapseSelection,
+        ),
+      );
+      _updateSelectedContentIfNeeded();
       return;
     }
     final bool adjustingSelectionExtend = _determineIsAdjustingSelectionEnd(forward);
@@ -1027,6 +1039,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
         isEnd: _adjustingSelectionEnd!,
         direction: forward ? SelectionExtendDirection.nextLine : SelectionExtendDirection.previousLine,
         dx: globalSelectionPointOffset.dx,
+        collapseSelection: collapseSelection,
       ),
     );
     _updateSelectedContentIfNeeded();
@@ -1324,7 +1337,7 @@ class _GranularlyExtendSelectionAction<T extends DirectionalTextEditingIntent> e
 
   @override
   void invokeAction(T intent, [BuildContext? context]) {
-    state._granularlyExtendSelection(granularity, intent.forward);
+    state._granularlyExtendSelection(granularity, intent.forward, false);
   }
 }
 
@@ -1336,11 +1349,7 @@ class _GranularlyExtendCaretSelectionAction<T extends DirectionalCaretMovementIn
 
   @override
   void invokeAction(T intent, [BuildContext? context]) {
-    if (intent.collapseSelection) {
-      // Selectable region never collapses selection.
-      return;
-    }
-    state._granularlyExtendSelection(granularity, intent.forward);
+    state._granularlyExtendSelection(granularity, intent.forward,  intent.collapseSelection);
   }
 }
 
@@ -1351,11 +1360,7 @@ class _DirectionallyExtendCaretSelectionAction<T extends DirectionalCaretMovemen
 
   @override
   void invokeAction(T intent, [BuildContext? context]) {
-    if (intent.collapseSelection) {
-      // Selectable region never collapses selection.
-      return;
-    }
-    state._directionallyExtendSelection(intent.forward);
+    state._directionallyExtendSelection(intent.forward, intent.collapseSelection);
   }
 }
 
@@ -1590,7 +1595,27 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       // Removing such selectable doesn't require selection geometry update.
       return;
     }
+
+    final int index = selectables.indexOf(selectable);
     _removeSelectable(selectable);
+
+    // If the selection was collapsed at the deleted selectable, move it to previous selectable.
+    _isHandlingSelectionEvent = true;
+    if (currentSelectionStartIndex == currentSelectionEndIndex &&
+        value.status == SelectionStatus.collapsed &&
+        currentSelectionStartIndex == index - 1 &&
+        currentSelectionStartIndex >= 0) {
+      dispatchSelectionEventToChild(
+        selectables[currentSelectionStartIndex],
+        const DirectionallyExtendSelectionEvent(
+          isEnd: false,
+          direction: SelectionExtendDirection.previousLine,
+          dx: 0,
+          collapseSelection: true,
+        ),
+      );
+    }
+    _isHandlingSelectionEvent = false;
     _scheduleSelectableUpdate();
   }
 
@@ -2139,8 +2164,14 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
     }
     if (event.isEnd) {
       currentSelectionEndIndex = targetIndex;
+      if (event.collapseSelection) {
+        currentSelectionStartIndex = targetIndex;
+      }
     } else {
       currentSelectionStartIndex = targetIndex;
+      if (event.collapseSelection) {
+        currentSelectionEndIndex = targetIndex;
+      }
     }
     return result;
   }
