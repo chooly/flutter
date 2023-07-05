@@ -997,6 +997,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
         granularity: granularity,
       ),
     );
+    _updateSelectedContentIfNeeded();
   }
 
   double? _directionalHorizontalBaseline;
@@ -1018,6 +1019,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
         dx: globalSelectionPointOffset.dx,
       ),
     );
+    _updateSelectedContentIfNeeded();
   }
 
   // [TextSelectionDelegate] overrides.
