@@ -1421,6 +1421,7 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
       // Make sure the selectable has up to date events.
       final Offset deltaToOrigin = _getDeltaToScrollOrigin(state);
       final Offset startOffset = _currentDragStartRelatedToOrigin!.translate(-deltaToOrigin.dx, -deltaToOrigin.dy);
+      _selectableStartEdgeUpdateRecords[selectable] = newRecord;
       selectable.dispatchSelectionEvent(SelectionEdgeUpdateEvent.forStart(globalPosition: startOffset));
     }
     final double? previousEndRecord = _selectableEndEdgeUpdateRecords[selectable];
@@ -1429,6 +1430,7 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
       // Make sure the selectable has up to date events.
       final Offset deltaToOrigin = _getDeltaToScrollOrigin(state);
       final Offset endOffset = _currentDragEndRelatedToOrigin!.translate(-deltaToOrigin.dx, -deltaToOrigin.dy);
+      _selectableEndEdgeUpdateRecords[selectable] = newRecord;
       selectable.dispatchSelectionEvent(SelectionEdgeUpdateEvent.forEnd(globalPosition: endOffset));
     }
   }
