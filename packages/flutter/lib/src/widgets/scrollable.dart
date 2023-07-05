@@ -1201,12 +1201,35 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
       // scrollable boundary will act as selecting the entire content in the
       // scrollable. This logic move the offset to the 0.0 or infinity to cover
       // the entire content if the input position is outside of the scrollable.
-      if (localPosition.dy < 0 || localPosition.dx < 0) {
-        return box.localToGlobal(Offset.zero);
+      final double dx;
+      final double dy;
+      switch (state.axisDirection) {
+        case AxisDirection.up:
+          dx = localPosition.dx;
+          dy = (localPosition.dy > box.size.height)
+              ? 0
+              : ((localPosition.dy < 0) ? double.infinity : localPosition.dy);
+          break;
+        case AxisDirection.down:
+          dx = localPosition.dx;
+          dy = (localPosition.dy > box.size.height)
+              ? double.infinity
+              : ((localPosition.dy < 0) ? 0 : localPosition.dy);
+          break;
+        case AxisDirection.left:
+          dy = localPosition.dy;
+          dx = (localPosition.dx > box.size.width)
+              ? 0
+              : ((localPosition.dx < 0) ? double.infinity : localPosition.dx);
+          break;
+        case AxisDirection.right:
+          dy = localPosition.dy;
+          dx = (localPosition.dx > box.size.width)
+              ? double.infinity
+              : ((localPosition.dx < 0) ? 0 : localPosition.dx);
+          break;
       }
-      if (localPosition.dy > box.size.height || localPosition.dx > box.size.width) {
-        return Offset.infinite;
-      }
+      return box.localToGlobal(Offset(dx, dy));
     }
     final Offset deltaToOrigin = _getDeltaToScrollOrigin(state);
     return box.localToGlobal(localPosition.translate(deltaToOrigin.dx, deltaToOrigin.dy));
