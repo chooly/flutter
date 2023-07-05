@@ -189,6 +189,7 @@ void main() {
       tester,
       SelectionRegistrarScope(
         registrar: registrar,
+        enclose: false,
         child: SelectionContainer(
           delegate: delegate,
           child: const Column(
@@ -214,6 +215,9 @@ class TestContainerDelegate extends MultiSelectableSelectionContainerDelegate {
   void ensureChildUpdated(Selectable selectable) {
     throw UnimplementedError();
   }
+
+  @override
+  bool get enclose => false;
 }
 
 class TestSelectionRegistrar extends SelectionRegistrar {
