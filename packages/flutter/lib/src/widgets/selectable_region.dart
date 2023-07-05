@@ -1371,6 +1371,9 @@ class _SelectableRegionContainerDelegate extends MultiSelectableSelectionContain
   Offset? _lastEndEdgeUpdateGlobalPosition;
 
   @override
+  bool get enclose => true;
+
+  @override
   void remove(Selectable selectable) {
     _hasReceivedStartEvent.remove(selectable);
     _hasReceivedEndEvent.remove(selectable);
@@ -1526,6 +1529,9 @@ class _SelectableRegionContainerDelegate extends MultiSelectableSelectionContain
 abstract class MultiSelectableSelectionContainerDelegate extends SelectionContainerDelegate with ChangeNotifier {
   /// Gets the list of selectables this delegate is managing.
   List<Selectable> selectables = <Selectable>[];
+
+  /// Whether selection should stay within the tree when extending selection.
+  bool get enclose;
 
   /// The number of additional pixels added to the selection handle drawable
   /// area.

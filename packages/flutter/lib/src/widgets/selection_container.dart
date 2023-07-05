@@ -103,6 +103,7 @@ class SelectionContainer extends StatefulWidget {
 
 class _SelectionContainerState extends State<SelectionContainer> with Selectable, SelectionRegistrant {
   final Set<VoidCallback> _listeners = <VoidCallback>{};
+  SelectionScope? scope;
 
   static const SelectionGeometry _disabledGeometry = SelectionGeometry(
     status: SelectionStatus.none,
@@ -153,6 +154,7 @@ class _SelectionContainerState extends State<SelectionContainer> with Selectable
     if (widget.registrar == null && !widget._disabled) {
       registrar = SelectionContainer.maybeOf(context);
     }
+    scope = SelectionScope.maybeOf(context);
     assert(!widget._disabled || registrar == null);
   }
 
@@ -218,10 +220,16 @@ class _SelectionContainerState extends State<SelectionContainer> with Selectable
     if (widget._disabled) {
       return SelectionRegistrarScope._disabled(child: widget.child);
     }
-    return SelectionRegistrarScope(
+    Widget child = SelectionRegistrarScope(
       registrar: widget.delegate!,
+      enclose: scope?.enclose ?? false,
       child: widget.child,
     );
+    if (scope != null && scope!.enclose) {
+      // This scope is enclosed, so its children doesn't need to.
+      child = SelectionScope(enclose: false, child: child);
+    }
+    return child;
   }
 }
 
@@ -239,6 +247,7 @@ class SelectionRegistrarScope extends InheritedWidget {
   const SelectionRegistrarScope({
     super.key,
     required SelectionRegistrar this.registrar,
+    required this.enclose,
     required super.child,
   });
 
@@ -246,14 +255,38 @@ class SelectionRegistrarScope extends InheritedWidget {
   /// subtree.
   const SelectionRegistrarScope._disabled({
     required super.child,
-  }) : registrar = null;
+  })  : registrar = null,
+        enclose = false;
 
   /// The [SelectionRegistrar] hosted by this widget.
   final SelectionRegistrar? registrar;
 
+  /// Whether selection should stay within the subtee. 
+  final bool enclose;
+
   @override
   bool updateShouldNotify(SelectionRegistrarScope oldWidget) {
     return oldWidget.registrar != registrar;
+  }
+}
+
+/// Whether selection should stay within the subtree when extending selections.
+class SelectionScope extends InheritedWidget {
+  /// Creates a selection registrar scope that host the [registrar].
+  const SelectionScope({super.key, required this.enclose, required super.child});
+
+  @override
+  bool updateShouldNotify(SelectionScope oldWidget) {
+    return true;
+  }
+
+  /// Whether selection should stay within the subtee. 
+  final bool enclose;
+
+  /// Get [SelectionScope] from context.
+  static SelectionScope? maybeOf(BuildContext context) {
+    final SelectionScope? scope = context.dependOnInheritedWidgetOfExactType<SelectionScope>();
+    return scope;
   }
 }
 
