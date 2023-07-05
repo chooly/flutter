@@ -2048,7 +2048,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       if (event.forward) {
         currentSelectionStartIndex = currentSelectionEndIndex = 0;
       } else {
-        currentSelectionStartIndex = currentSelectionEndIndex = selectables.length;
+        currentSelectionStartIndex = currentSelectionEndIndex = selectables.length - 1;
       }
     }
     int targetIndex = event.isEnd ? currentSelectionEndIndex : currentSelectionStartIndex;
@@ -2084,7 +2084,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       switch (event.direction) {
         case SelectionExtendDirection.previousLine:
         case SelectionExtendDirection.backward:
-          currentSelectionStartIndex = currentSelectionEndIndex = selectables.length;
+          currentSelectionStartIndex = currentSelectionEndIndex = selectables.length - 1;
         case SelectionExtendDirection.nextLine:
         case SelectionExtendDirection.forward:
         currentSelectionStartIndex = currentSelectionEndIndex = 0;
