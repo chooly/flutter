@@ -1037,6 +1037,7 @@ class _ScrollableSelectionHandlerState extends State<_ScrollableSelectionHandler
     _selectionDelegate = _ScrollableSelectionContainerDelegate(
       state: widget.state,
       position: widget.position,
+      enclose: false,
     );
   }
 
@@ -1046,6 +1047,13 @@ class _ScrollableSelectionHandlerState extends State<_ScrollableSelectionHandler
     if (oldWidget.position != widget.position) {
       _selectionDelegate.position = widget.position;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selectionDelegate.enclose =
+        SelectionScope.maybeOf(context)?.enclose ?? false;
   }
 
   @override
@@ -1074,9 +1082,11 @@ class _ScrollableSelectionHandlerState extends State<_ScrollableSelectionHandler
 class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionContainerDelegate {
   _ScrollableSelectionContainerDelegate({
     required this.state,
-    required ScrollPosition position
-  }) : _position = position,
-       _autoScroller = EdgeDraggingAutoScroller(state, velocityScalar: _kDefaultSelectToScrollVelocityScalar) {
+    required ScrollPosition position,
+    required bool enclose,
+  })  : _position = position,
+        _autoScroller = EdgeDraggingAutoScroller(state, velocityScalar: _kDefaultSelectToScrollVelocityScalar),
+        _enclose = enclose {
     _position.addListener(_scheduleLayoutChange);
   }
 
@@ -1088,6 +1098,7 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
 
   final ScrollableState state;
   final EdgeDraggingAutoScroller _autoScroller;
+  bool _enclose;
   bool _scheduledLayoutChange = false;
   Offset? _currentDragStartRelatedToOrigin;
   Offset? _currentDragEndRelatedToOrigin;
@@ -1105,6 +1116,10 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
     _position = other;
     _position.addListener(_scheduleLayoutChange);
   }
+
+  @override
+  bool get enclose => _enclose;
+  set enclose(bool other) => _enclose = other;
 
   // The layout will only be updated a frame later than position changes.
   // Schedule PostFrameCallback to capture the accurate layout.
@@ -1285,6 +1300,12 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
   @override
   SelectionResult handleDirectionallyExtendSelection(DirectionallyExtendSelectionEvent event) {
     final SelectionResult result = super.handleDirectionallyExtendSelection(event);
+    if (enclose && (result == SelectionResult.next || result == SelectionResult.previous)) {
+      // The last child says it should move to next, or the first child says it should move to
+      // previous, but the selection should be enclosed within the tree. Re-select the last or fist child.
+      dispatchSelectionEventToChild(selectables[currentSelectionEndIndex], const SelectAllSelectionEvent());
+      return SelectionResult.end;
+    }
     // The selection geometry may not have the accurate offset for the edges
     // that are outside of the viewport whose transform may not be valid. Only
     // the edge this event is updating is sure to be accurate.
