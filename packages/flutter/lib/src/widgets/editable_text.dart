@@ -4456,8 +4456,9 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
   }
   late final Action<UpdateSelectionIntent> _updateSelectionAction = CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
 
-  late final _UpdateTextSelectionVerticallyAction<DirectionalCaretMovementIntent> _verticalSelectionUpdateAction =
-      _UpdateTextSelectionVerticallyAction<DirectionalCaretMovementIntent>(this);
+  // Selection can be updated vertically by line or by page in the same run.
+  late final _UpdateTextSelectionVertically<DirectionalCaretMovementIntent> _verticalSelectionUpdateAction =
+      _UpdateTextSelectionVertically<DirectionalCaretMovementIntent>(this);
 
   Object? _hideToolbarIfVisible(DismissIntent intent) {
     if (_selectionOverlay?.toolbarIsVisible ?? false) {
@@ -4518,8 +4519,8 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
     ExtendSelectionToNextWordBoundaryIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(this, _nextWordBoundary, _moveBeyondTextBoundary, ignoreNonCollapsedSelection: true)),
     ExtendSelectionToNextParagraphBoundaryIntent : _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToNextParagraphBoundaryIntent>(this, _paragraphBoundary, _moveBeyondTextBoundary, ignoreNonCollapsedSelection: true)),
     ExtendSelectionToLineBreakIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(this, _linebreak, _moveToTextBoundary, ignoreNonCollapsedSelection: true)),
-    ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_verticalSelectionUpdateAction),
-    ExtendSelectionVerticallyToAdjacentPageIntent: _makeOverridable(_verticalSelectionUpdateAction),
+    ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_UpdateTextSelectionVerticallyAction<ExtendSelectionVerticallyToAdjacentLineIntent>(_verticalSelectionUpdateAction)),
+    ExtendSelectionVerticallyToAdjacentPageIntent: _makeOverridable(_UpdateTextSelectionVerticallyAction<ExtendSelectionVerticallyToAdjacentPageIntent>(_verticalSelectionUpdateAction)),
     ExtendSelectionToNextParagraphBoundaryOrCaretLocationIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToNextParagraphBoundaryOrCaretLocationIntent>(this, _paragraphBoundary, _moveBeyondTextBoundary, ignoreNonCollapsedSelection: true)),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(this, _documentBoundary, _moveBeyondTextBoundary, ignoreNonCollapsedSelection: true)),
     ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryOrCaretLocationIntent>(this, _nextWordBoundary, _moveBeyondTextBoundary, ignoreNonCollapsedSelection: true)),
@@ -5298,8 +5299,8 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
   bool get isActionEnabled => state._value.selection.isValid;
 }
 
-class _UpdateTextSelectionVerticallyAction<T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
-  _UpdateTextSelectionVerticallyAction(this.state);
+class _UpdateTextSelectionVertically<T extends DirectionalCaretMovementIntent> {
+  _UpdateTextSelectionVertically(this.state);
 
   final EditableTextState state;
 
@@ -5323,7 +5324,6 @@ class _UpdateTextSelectionVerticallyAction<T extends DirectionalCaretMovementInt
     }
   }
 
-  @override
   void invoke(T intent, [BuildContext? context]) {
     assert(state._value.selection.isValid);
 
@@ -5360,9 +5360,20 @@ class _UpdateTextSelectionVerticallyAction<T extends DirectionalCaretMovementInt
       _runSelection = newSelection;
     }
   }
+}
+
+class _UpdateTextSelectionVerticallyAction<T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
+  _UpdateTextSelectionVerticallyAction(this._updater);
+
+  final _UpdateTextSelectionVertically<DirectionalCaretMovementIntent> _updater;
 
   @override
-  bool get isActionEnabled => state._value.selection.isValid;
+  void invoke(T intent, [BuildContext? context]) {
+    _updater.invoke(intent, context);
+  }
+
+  @override
+  bool get isActionEnabled => _updater.state._value.selection.isValid;
 }
 
 class _SelectAllAction extends ContextAction<SelectAllTextIntent> {
