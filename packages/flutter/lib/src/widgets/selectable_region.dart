@@ -1515,11 +1515,35 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
 
   /// The current selectable that contains the selection end edge.
   @protected
-  int currentSelectionEndIndex = -1;
+  int _currentSelectionEndIndex = -1;
+
+  /// The current selectable that contains the selection end edge.
+  int get currentSelectionEndIndex => _currentSelectionEndIndex;
+
+  /// The current selectable that contains the selection end edge.
+  set currentSelectionEndIndex(int value) {
+    if (kDebugPrintSelectionChange) {
+      debugPrint(
+          '[Selection] $this currentSelectionEndIndex $_currentSelectionEndIndex');
+    }
+    _currentSelectionEndIndex = value;
+  }
 
   /// The current selectable that contains the selection start edge.
   @protected
-  int currentSelectionStartIndex = -1;
+  int _currentSelectionStartIndex = -1;
+
+  /// The current selectable that contains the selection start edge.
+  int get currentSelectionStartIndex => _currentSelectionStartIndex;
+
+  /// The current selectable that contains the selection start edge.
+  set currentSelectionStartIndex(int value) {
+    if (kDebugPrintSelectionChange) {
+      debugPrint(
+          '[Selection] $this currentSelectionStartIndex $_currentSelectionStartIndex');
+    }
+    _currentSelectionStartIndex = value;
+  }
 
   LayerLink? _startHandleLayer;
   Selectable? _startHandleLayerOwner;
@@ -1535,6 +1559,9 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
 
   @override
   void add(Selectable selectable) {
+    if (kDebugPrintSelectionChange) {
+      debugPrint('[Selection] add $selectable to $this');
+    }
     assert(!selectables.contains(selectable));
     _additions.add(selectable);
     _scheduleSelectableUpdate();
@@ -1542,6 +1569,9 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
 
   @override
   void remove(Selectable selectable) {
+    if (kDebugPrintSelectionChange) {
+      debugPrint('[Selection] remove $selectable from $this');
+    }
     if (_additions.remove(selectable)) {
       // The same selectable was added in the same frame and is not yet
       // incorporated into the selectables.
@@ -1590,6 +1620,9 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   }
 
   void _flushAdditions() {
+    if (kDebugPrintSelectionChange) {
+      debugPrint('[Selection] flush ${_additions.length} new selectables');
+    }
     final List<Selectable> mergingSelectables = _additions.toList()..sort(compareOrder);
     final List<Selectable> existingSelectables = selectables;
     selectables = <Selectable>[];
@@ -1670,6 +1703,10 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
     if (_selectionGeometry != newValue) {
       _selectionGeometry = newValue;
       notifyListeners();
+      if (kDebugPrintSelectionChange) {
+        debugPrint(
+            '[Selection] $this geometry changed ${_selectionGeometry.status}');
+      }
     }
     _updateHandleLayersAndOwners();
   }
@@ -2146,6 +2183,9 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
     }
     _isHandlingSelectionEvent = false;
     _updateSelectionGeometry();
+    if (kDebugPrintSelectionChange) {
+      debugPrint('[Selection] $this handle ${event.type} result $result status ${value.status}');
+    }
     return result;
   }
 
@@ -2175,6 +2215,10 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   /// treatments prior to sending the selection events.
   @protected
   SelectionResult dispatchSelectionEventToChild(Selectable selectable, SelectionEvent event) {
+    if (kDebugPrintSelectionChange) {
+      debugPrint(
+          '[Selection] $this is dispatching ${event.type} to child $selectable');
+    }
     return selectable.dispatchSelectionEvent(event);
   }
 

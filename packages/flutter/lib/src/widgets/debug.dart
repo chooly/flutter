@@ -167,6 +167,9 @@ bool debugEnhanceBuildTimelineArguments = false;
 /// Show banners for deprecated widgets.
 bool debugHighlightDeprecatedWidgets = false;
 
+/// Log state changes related to SelectableRegion.
+const bool kDebugPrintSelectionChange = false;
+
 Key? _firstNonUniqueKey(Iterable<Widget> widgets) {
   final Set<Key> keySet = HashSet<Key>();
   for (final Widget widget in widgets) {
@@ -507,7 +510,8 @@ bool debugAssertAllWidgetVarsUnset(String reason) {
         debugPrintGlobalKeyedWidgetLifecycle ||
         debugProfileBuildsEnabled ||
         debugHighlightDeprecatedWidgets ||
-        debugProfileBuildsEnabledUserWidgets) {
+        debugProfileBuildsEnabledUserWidgets ||
+        kDebugPrintSelectionChange) {
       throw FlutterError(reason);
     }
     return true;
