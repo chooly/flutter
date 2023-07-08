@@ -1408,7 +1408,9 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
         ensureChildUpdated(selectable);
       case SelectionEventType.granularlyExtendSelection:
       case SelectionEventType.directionallyExtendSelection:
-        ensureChildUpdated(selectable);
+        if (!(event as DirectionallyExtendSelectionEvent).collapseSelection) {
+          ensureChildUpdated(selectable);
+        }
         _selectableStartEdgeUpdateRecords[selectable] = state.position.pixels;
         _selectableEndEdgeUpdateRecords[selectable] = state.position.pixels;
       case SelectionEventType.clear:
