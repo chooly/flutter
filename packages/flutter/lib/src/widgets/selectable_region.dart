@@ -1555,26 +1555,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       return;
     }
 
-    final int index = selectables.indexOf(selectable);
     _removeSelectable(selectable);
-
-    // If the selection was collapsed at the deleted selectable, move it to previous selectable.
-    _isHandlingSelectionEvent = true;
-    if (currentSelectionStartIndex == currentSelectionEndIndex &&
-        value.status == SelectionStatus.collapsed &&
-        currentSelectionStartIndex == index - 1 &&
-        currentSelectionStartIndex >= 0) {
-      dispatchSelectionEventToChild(
-        selectables[currentSelectionStartIndex],
-        const DirectionallyExtendSelectionEvent(
-          isEnd: false,
-          direction: SelectionExtendDirection.previousLine,
-          dx: 0,
-          collapseSelection: true,
-        ),
-      );
-    }
-    _isHandlingSelectionEvent = false;
     _scheduleSelectableUpdate();
   }
 
