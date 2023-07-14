@@ -917,7 +917,8 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
               builder: (BuildContext context) {
                 return Actions(
                   actions: <Type, Action<Intent>>{
-                    DismissIntent: _DismissModalAction(context),
+                    DismissIntent: Action<DismissIntent>.overridable(
+                        defaultAction: _DismissModalAction(context), context: context),
                   },
                   child: PrimaryScrollController(
                     controller: primaryScrollController,
