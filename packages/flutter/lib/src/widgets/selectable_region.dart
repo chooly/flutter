@@ -432,7 +432,6 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
           ..onStart = _handleMouseDragStart
           ..onUpdate = _handleMouseDragUpdate
           ..onEnd = _handleMouseDragEnd
-          ..onCancel = _clearSelection
           ..dragStartBehavior = DragStartBehavior.down;
       },
     );
@@ -453,6 +452,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
   void _handleSingleTapDown(TapDownDetails details) {
     _selectStartTo(offset: details.globalPosition);
     _selectEndTo(offset: details.globalPosition);
+    _updateSelectedContentIfNeeded();
   }
 
   void _startNewMouseSelectionGesture(DragDownDetails details) {
