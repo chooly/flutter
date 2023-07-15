@@ -1326,7 +1326,9 @@ class _ScrollableSelectionContainerDelegate extends MultiSelectableSelectionCont
     if (enclose && (result == SelectionResult.next || result == SelectionResult.previous)) {
       // The last child says it should move to next, or the first child says it should move to
       // previous, but the selection should be enclosed within the tree. Re-select the last or fist child.
-      dispatchSelectionEventToChild(selectables[currentSelectionEndIndex], event);
+      if (selectables.isNotEmpty) {
+        dispatchSelectionEventToChild(selectables[currentSelectionEndIndex], event);
+      }
       return SelectionResult.end;
     }
     if (result == SelectionResult.next || result == SelectionResult.previous) {
