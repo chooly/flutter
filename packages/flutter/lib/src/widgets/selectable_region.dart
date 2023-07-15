@@ -1896,7 +1896,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       effectiveStartHandle = hideStartHandle ? null : _startHandleLayer;
       effectiveEndHandle = hideEndHandle ? null : _endHandleLayer;
     }
-    if (currentSelectionStartIndex == -1 || currentSelectionEndIndex == -1) {
+    if (currentSelectionStartIndex == -1 || currentSelectionEndIndex == -1 || selectables.isEmpty) {
       // No valid selection.
       if (_startHandleLayerOwner != null) {
         _startHandleLayerOwner!.pushHandleLayers(null, null);
@@ -2055,6 +2055,10 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   @protected
   SelectionResult handleDirectionallyExtendSelection(DirectionallyExtendSelectionEvent event) {
     assert((currentSelectionStartIndex == -1) == (currentSelectionEndIndex == -1));
+    if (selectables.isEmpty) {
+      currentSelectionStartIndex = currentSelectionEndIndex = -1;
+      return SelectionResult.next;
+    }
     if (currentSelectionStartIndex == -1) {
       switch (event.direction) {
         case SelectionExtendDirection.previousLine:
