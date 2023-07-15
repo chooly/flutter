@@ -2103,14 +2103,24 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
         assert(result == SelectionResult.end);
     }
     if (event.isEnd) {
-      currentSelectionEndIndex = targetIndex;
       if (event.collapseSelection) {
+        for (int i = currentSelectionStartIndex; i < currentSelectionEndIndex; i++) {
+          dispatchSelectionEventToChild(selectables[i], const ClearSelectionEvent());
+        }
         currentSelectionStartIndex = targetIndex;
+        currentSelectionEndIndex = targetIndex;
+      } else {
+        currentSelectionEndIndex = targetIndex;
       }
     } else {
-      currentSelectionStartIndex = targetIndex;
       if (event.collapseSelection) {
+        for (int i = currentSelectionEndIndex; i > currentSelectionStartIndex; i--) {
+          dispatchSelectionEventToChild(selectables[i], const ClearSelectionEvent());
+        }
         currentSelectionEndIndex = targetIndex;
+        currentSelectionStartIndex = targetIndex;
+      } else {
+        currentSelectionStartIndex = targetIndex;
       }
     }
     return result;
