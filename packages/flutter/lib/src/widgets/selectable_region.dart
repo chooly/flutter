@@ -2052,7 +2052,8 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   @protected
   SelectionResult handleSelectWord(SelectWordSelectionEvent event) {
     SelectionResult? lastSelectionResult;
-    for (int index = 0; index < selectables.length; index += 1) {
+    int index;
+    for (index = 0; index < selectables.length; index += 1) {
       final Rect localRect = Rect.fromLTWH(0, 0, selectables[index].size.width, selectables[index].size.height);
       final Matrix4 transform = selectables[index].getTransformTo(null);
       final Rect globalRect = MatrixUtils.transformRect(transform, localRect);
@@ -2084,7 +2085,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       }
     }
     if (lastSelectionResult == SelectionResult.next) {
-      currentSelectionStartIndex = currentSelectionEndIndex = selectables.length - 1;
+      currentSelectionStartIndex = currentSelectionEndIndex = index - 1;
       return SelectionResult.end;
     }
     assert(lastSelectionResult == null);
