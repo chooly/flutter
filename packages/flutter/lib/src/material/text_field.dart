@@ -88,6 +88,19 @@ class _TextFieldSelectionGestureDetectorBuilder extends TextSelectionGestureDete
       }
     }
   }
+
+  @override
+  Widget buildGestureDetector({
+    Key? key,
+    HitTestBehavior? behavior,
+    required Widget child,
+  }) {
+    if (_state.widget.skipSelectionGestureDetection) {
+      return child;
+    } else {
+      return super.buildGestureDetector(child: child);
+    }
+  }
 }
 
 /// A Material Design text field.
@@ -310,6 +323,8 @@ class TextField extends StatefulWidget {
     this.canRequestFocus = true,
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
+    this.editableTextKey,
+    this.skipSelectionGestureDetection = false,
   }) : assert(obscuringCharacter.length == 1),
        smartDashesType = smartDashesType ?? (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
        smartQuotesType = smartQuotesType ?? (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
@@ -786,6 +801,13 @@ class TextField extends StatefulWidget {
   /// configuration, then [materialMisspelledTextStyle] is used by default.
   final SpellCheckConfiguration? spellCheckConfiguration;
 
+  /// Skip selection gesture detection to allow caller to build their own gesture
+  /// detection mechanism.
+  final bool skipSelectionGestureDetection;
+
+  /// key for the underlying [EditableText].
+  final GlobalKey<EditableTextState>? editableTextKey;
+
   /// The [TextStyle] used to indicate misspelled words in the Material style.
   ///
   /// See also:
@@ -925,8 +947,10 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
   @override
   late bool forcePressEnabled;
 
+  final GlobalKey<EditableTextState> _editableTextKey = GlobalKey<EditableTextState>();
+
   @override
-  final GlobalKey<EditableTextState> editableTextKey = GlobalKey<EditableTextState>();
+  GlobalKey<EditableTextState> get editableTextKey => widget.editableTextKey ?? _editableTextKey;
 
   @override
   bool get selectionEnabled => widget.selectionEnabled;
