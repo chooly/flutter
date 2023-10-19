@@ -567,7 +567,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     }
   }
 
-  void _handleMouseDragEnd(DragEndDetails details) {
+  void _handleMouseDragEnd(TapDragEndDetails details) {
     _finalizeSelection();
     if (widget.showMenuWhenDrag) {
       _showToolbar();
