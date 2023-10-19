@@ -539,11 +539,6 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     _updateSelectedContentIfNeeded();
   }
 
-  void _handleMouseDragEnd(TapDragEndDetails details) {
-    _finalizeSelection();
-    _updateSelectedContentIfNeeded();
-  }
-
   void _handleMouseTapUp(TapDragUpDetails details) {
     switch (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount)) {
       case 1:
@@ -569,7 +564,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
     }
   }
 
-  void _handleMouseDragEnd(DragEndDetails details) {
+  void _handleMouseDragEnd(TapDragEndDetails details) {
     _finalizeSelection();
     if (widget.showMenuWhenDrag) {
       _showToolbar();
