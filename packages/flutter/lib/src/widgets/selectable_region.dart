@@ -360,6 +360,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
           } else {
             hideToolbar();
             _collapseSelectionAt(offset: details.globalPosition);
+            _updateSelectedContentIfNeeded();
           }
         };
         instance.onSecondaryTapDown = _handleRightClickDown;
