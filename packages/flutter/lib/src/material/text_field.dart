@@ -191,6 +191,13 @@ class _TextFieldSelectionGestureDetectorBuilder extends TextSelectionGestureDete
 ///
 /// {@macro flutter.widgets.editableText.accessibility}
 ///
+/// {@tool dartpad}
+/// This sample shows how to style a text field to match a filled or outlined
+/// Material Design 3 text field.
+///
+/// ** See code in examples/api/lib/material/text_field/text_field.2.dart **
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [TextFormField], which integrates with the [Form] widget.
@@ -244,13 +251,7 @@ class TextField extends StatefulWidget {
   ///
   /// The [selectionHeightStyle] and [selectionWidthStyle] properties allow
   /// changing the shape of the selection highlighting. These properties default
-  /// to [ui.BoxHeightStyle.tight] and [ui.BoxWidthStyle.tight] respectively and
-  /// must not be null.
-  ///
-  /// The [textAlign], [autofocus], [obscureText], [readOnly], [autocorrect],
-  /// [scrollPadding], [maxLines], [maxLength], [selectionHeightStyle],
-  /// [selectionWidthStyle], [enableSuggestions], and
-  /// [enableIMEPersonalizedLearning] arguments must not be null.
+  /// to [ui.BoxHeightStyle.tight] and [ui.BoxWidthStyle.tight], respectively.
   ///
   /// See also:
   ///
@@ -323,10 +324,10 @@ class TextField extends StatefulWidget {
     this.canRequestFocus = true,
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
-    this.painter,
+    this.backgroundPainter,
     this.foregroundPainter,
     this.editableTextKey,
-    this.skipSelectionGestureDetection = false,
+    this.skipSelectionGestureDetection = false
   }) : assert(obscuringCharacter.length == 1),
        smartDashesType = smartDashesType ?? (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
        smartQuotesType = smartQuotesType ?? (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
@@ -439,7 +440,12 @@ class TextField extends StatefulWidget {
   ///
   /// This text style is also used as the base style for the [decoration].
   ///
-  /// If null, defaults to the `titleMedium` text style from the current [Theme].
+  /// If null, [TextTheme.bodyLarge] will be used. When the text field is disabled,
+  /// [TextTheme.bodyLarge] with an opacity of 0.38 will be used instead.
+  ///
+  /// If null and [ThemeData.useMaterial3] is false, [TextTheme.titleMedium] will
+  /// be used. When the text field is disabled, [TextTheme.titleMedium] with
+  /// [ThemeData.disabledColor] will be used instead.
   final TextStyle? style;
 
   /// {@macro flutter.widgets.editableText.strutStyle}
@@ -803,10 +809,10 @@ class TextField extends StatefulWidget {
   /// configuration, then [materialMisspelledTextStyle] is used by default.
   final SpellCheckConfiguration? spellCheckConfiguration;
 
-  /// {@macro flutter.rendering.editable.RenderEditablePainter}
-  final RenderEditablePainter? painter;
+  /// {@macro flutter.widgets.EditableText.backgroundPainter}
+  final RenderEditablePainter? backgroundPainter;
 
-  /// {@macro flutter.rendering.editable.RenderEditablePainter}
+  /// {@macro flutter.widgets.EditableText.foregroundPainter}
   final RenderEditablePainter? foregroundPainter;
 
   /// Skip selection gesture detection to allow caller to build their own gesture
@@ -828,7 +834,7 @@ class TextField extends StatefulWidget {
       decoration: TextDecoration.underline,
       decorationColor: Colors.red,
       decorationStyle: TextDecorationStyle.wavy,
-  );
+    );
 
   /// Default builder for [TextField]'s spell check suggestions toolbar.
   ///
@@ -970,7 +976,7 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
 
   bool get _hasIntrinsicError => widget.maxLength != null && widget.maxLength! > 0 && _effectiveController.value.text.characters.length > widget.maxLength!;
 
-  bool get _hasError => widget.decoration?.errorText != null || _hasIntrinsicError;
+  bool get _hasError => widget.decoration?.errorText != null || widget.decoration?.error != null || _hasIntrinsicError;
 
   Color get _errorColor => widget.decoration?.errorStyle?.color ?? Theme.of(context).colorScheme.error;
 
@@ -1273,7 +1279,8 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
 
     final ThemeData theme = Theme.of(context);
     final DefaultSelectionStyle selectionStyle = DefaultSelectionStyle.of(context);
-    final TextStyle style = _getInputStyleForState(theme.useMaterial3 ? _m3InputStyle(context) : theme.textTheme.titleMedium!).merge(widget.style);
+    final TextStyle? providedStyle = MaterialStateProperty.resolveAs(widget.style, _materialState);
+    final TextStyle style = _getInputStyleForState(theme.useMaterial3 ? _m3InputStyle(context) : theme.textTheme.titleMedium!).merge(providedStyle);
     final Brightness keyboardAppearance = widget.keyboardAppearance ?? theme.brightness;
     final TextEditingController controller = _effectiveController;
     final FocusNode focusNode = _effectiveFocusNode;
@@ -1315,6 +1322,7 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
     Color? autocorrectionTextRectColor;
     Radius? cursorRadius = widget.cursorRadius;
     VoidCallback? handleDidGainAccessibilityFocus;
+    VoidCallback? handleDidLoseAccessibilityFocus;
 
     switch (theme.platform) {
       case TargetPlatform.iOS:
@@ -1345,6 +1353,9 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
             _effectiveFocusNode.requestFocus();
           }
         };
+        handleDidLoseAccessibilityFocus = () {
+          _effectiveFocusNode.unfocus();
+        };
 
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
@@ -1362,6 +1373,15 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
         cursorOpacityAnimates ??= false;
         cursorColor = _hasError ? _errorColor : widget.cursorColor ?? selectionStyle.cursorColor ?? theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ?? theme.colorScheme.primary.withOpacity(0.40);
+        handleDidGainAccessibilityFocus = () {
+          // Automatically activate the TextField when it receives accessibility focus.
+          if (!_effectiveFocusNode.hasFocus && _effectiveFocusNode.canRequestFocus) {
+            _effectiveFocusNode.requestFocus();
+          }
+        };
+        handleDidLoseAccessibilityFocus = () {
+          _effectiveFocusNode.unfocus();
+        };
 
       case TargetPlatform.windows:
         forcePressEnabled = false;
@@ -1375,6 +1395,9 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
           if (!_effectiveFocusNode.hasFocus && _effectiveFocusNode.canRequestFocus) {
             _effectiveFocusNode.requestFocus();
           }
+        };
+        handleDidLoseAccessibilityFocus = () {
+          _effectiveFocusNode.unfocus();
         };
     }
 
@@ -1446,7 +1469,7 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
           contextMenuBuilder: widget.contextMenuBuilder,
           spellCheckConfiguration: spellCheckConfiguration,
           magnifierConfiguration: widget.magnifierConfiguration ?? TextMagnifier.adaptiveMagnifierConfiguration,
-          painter: widget.painter,
+          backgroundPainter: widget.backgroundPainter,
           foregroundPainter: widget.foregroundPainter,
         ),
       ),
@@ -1505,6 +1528,7 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
                   _requestKeyboard();
                 },
                 onDidGainAccessibilityFocus: handleDidGainAccessibilityFocus,
+                onDidLoseAccessibilityFocus: handleDidLoseAccessibilityFocus,
                 child: child,
               );
             },
