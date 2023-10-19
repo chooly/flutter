@@ -505,7 +505,6 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
   void _startNewMouseSelectionGesture(TapDragDownDetails details) {
     switch (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount)) {
       case 1:
-        widget.focusNode.requestFocus();
         hideToolbar();
         switch (defaultTargetPlatform) {
           case TargetPlatform.android:
@@ -527,6 +526,7 @@ class SelectableRegionState extends State<SelectableRegion> with TextSelectionDe
   void _handleMouseDragStart(TapDragStartDetails details) {
     switch (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount)) {
       case 1:
+        widget.focusNode.requestFocus();
         _selectStartTo(offset: details.globalPosition);
     }
     _updateSelectedContentIfNeeded();
