@@ -1664,7 +1664,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   set currentSelectionEndIndex(int value) {
     if (kDebugPrintSelectionChange) {
       debugPrint(
-          '[Selection] $this currentSelectionEndIndex $_currentSelectionEndIndex');
+          '[Selection] $runtimeType $hashCode currentSelectionEndIndex $_currentSelectionEndIndex');
     }
     _currentSelectionEndIndex = value;
   }
@@ -1680,7 +1680,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   set currentSelectionStartIndex(int value) {
     if (kDebugPrintSelectionChange) {
       debugPrint(
-          '[Selection] $this currentSelectionStartIndex $_currentSelectionStartIndex');
+          '[Selection] $runtimeType $hashCode currentSelectionStartIndex $_currentSelectionStartIndex');
     }
     _currentSelectionStartIndex = value;
   }
@@ -1700,7 +1700,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   @override
   void add(Selectable selectable) {
     if (kDebugPrintSelectionChange) {
-      debugPrint('[Selection] add $selectable to $this');
+      debugPrint('[Selection] add $selectable to $runtimeType $hashCode');
     }
     assert(!selectables.contains(selectable));
     _additions.add(selectable);
@@ -1710,7 +1710,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   @override
   void remove(Selectable selectable) {
     if (kDebugPrintSelectionChange) {
-      debugPrint('[Selection] remove $selectable from $this');
+      debugPrint('[Selection] remove $selectable from $runtimeType $hashCode');
     }
     if (_additions.remove(selectable)) {
       // The same selectable was added in the same frame and is not yet
@@ -1845,7 +1845,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       notifyListeners();
       if (kDebugPrintSelectionChange) {
         debugPrint(
-            '[Selection] $this geometry changed ${_selectionGeometry.status}');
+            '[Selection] $runtimeType $hashCode geometry changed ${_selectionGeometry.status}');
       }
     }
     _updateHandleLayersAndOwners();
@@ -2352,7 +2352,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
     _isHandlingSelectionEvent = false;
     _updateSelectionGeometry();
     if (kDebugPrintSelectionChange) {
-      debugPrint('[Selection] $this handle ${event.type} result $result status ${value.status}');
+      debugPrint('[Selection] $runtimeType $hashCode handle ${event.type} result $result status ${value.status}');
     }
     return result;
   }
@@ -2385,7 +2385,7 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
   SelectionResult dispatchSelectionEventToChild(Selectable selectable, SelectionEvent event) {
     if (kDebugPrintSelectionChange) {
       debugPrint(
-          '[Selection] $this is dispatching ${event.type} to child $selectable');
+          '[Selection] $runtimeType $hashCode is dispatching ${event.type} to child $selectable');
     }
     return selectable.dispatchSelectionEvent(event);
   }
