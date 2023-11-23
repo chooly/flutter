@@ -59,9 +59,9 @@ class SelectionContainer extends StatefulWidget {
   /// {@end-tool}
   const SelectionContainer.disabled({
     super.key,
+    this.registrar,
     required this.child,
-  }) : registrar = null,
-       delegate = null;
+  }) : delegate = null;
 
   /// The [SelectionRegistrar] this container is registered to.
   ///
