@@ -17140,30 +17140,6 @@ void main() {
       ),
     );
 
-  testWidgets('Painters are passed to RenderEditable', (WidgetTester tester) async {
-    final RenderEditablePainter backgroundPainter = _TestRenderEditablePainter();
-    final RenderEditablePainter foregroundPainter = _TestRenderEditablePainter();
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: TextField(backgroundPainter: backgroundPainter, foregroundPainter: foregroundPainter),
-    final EditableTextState editableTextState = tester.firstState(find.byType(EditableText));
-    final RenderEditable renderEditable = editableTextState.renderEditable;
-
-    expect(renderEditable.painter, backgroundPainter);
-    expect(renderEditable.foregroundPainter, foregroundPainter);
-  });
-}
-
-/// A simple render editable painter that does nothing.
-class _TestRenderEditablePainter extends RenderEditablePainter {
-  _TestRenderEditablePainter();
-
-  @override
-  void paint(Canvas canvas, Size size, RenderEditable renderEditable) {}
-
-  @override
-  bool shouldRepaint(RenderEditablePainter? oldDelegate) => true;
     // Long press to put the cursor after the "F".
     final int index = initialText.indexOf('F');
     await tester.longPressAt(textOffsetToPosition(tester, index));
@@ -17451,7 +17427,34 @@ class _TestRenderEditablePainter extends RenderEditablePainter {
   },
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
->>>>>>> 3.19.0-8.0.pre
+
+  testWidgets('Painters are passed to RenderEditable', (WidgetTester tester) async {
+    final RenderEditablePainter backgroundPainter = _TestRenderEditablePainter();
+    final RenderEditablePainter foregroundPainter = _TestRenderEditablePainter();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+        child: TextField(
+            backgroundPainter: backgroundPainter,
+            foregroundPainter: foregroundPainter),
+    )));
+    final EditableTextState editableTextState = tester.firstState(find.byType(EditableText));
+    final RenderEditable renderEditable = editableTextState.renderEditable;
+
+    expect(renderEditable.painter, backgroundPainter);
+    expect(renderEditable.foregroundPainter, foregroundPainter);
+  });
+}
+
+/// A simple render editable painter that does nothing.
+class _TestRenderEditablePainter extends RenderEditablePainter {
+  _TestRenderEditablePainter();
+
+  @override
+  void paint(Canvas canvas, Size size, RenderEditable renderEditable) {}
+
+  @override
+  bool shouldRepaint(RenderEditablePainter? oldDelegate) => true;
 }
 
 /// A Simple widget for testing the obscure text.
