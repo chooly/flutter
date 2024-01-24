@@ -2286,14 +2286,11 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
         }
         return SelectionResult.end;
       } else {
-        if (lastSelectionResult != null) {
-          break;
+        if (lastSelectionResult == SelectionResult.next) {
+          currentSelectionStartIndex = currentSelectionEndIndex = index - 1;
+          return SelectionResult.end;
         }
       }
-    }
-    if (lastSelectionResult == SelectionResult.next) {
-      currentSelectionStartIndex = currentSelectionEndIndex = index - 1;
-      return SelectionResult.end;
     }
     assert(lastSelectionResult == null);
     return SelectionResult.end;
